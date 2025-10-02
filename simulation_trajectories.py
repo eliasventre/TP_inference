@@ -1,11 +1,14 @@
 # =====================================================================
-# Data Simulation Script for a 4-Gene Network (Harissa)
+# Data Simulation Script for aNetwork (Harissa)
 #
 # This script generates single-cell gene expression data 
-# from a predefined 4-gene regulatory network using Harissa.
+# from a predefined gene regulatory network using Harissa.
 # The output consists of simulated expression data stored in 
 # AnnData objects, and the true network topology (adjacency matrix).
 # =====================================================================
+
+# outfile='Network8'
+outfile='Network4'
 
 import sys
 sys.path += ['../']  # add Harissa to the Python path
@@ -27,41 +30,70 @@ C = 1000   # number of cells
 N = 5     # number of independent simulation runs
 
 # Time points (hours)
-t = np.linspace(0, 100, 10)
+t = np.linspace(0, 100, 10) 
 # Assign time points to cells (C cells distributed over len(t) time points)
 k = np.linspace(0, C, len(t)+1, dtype=int)
 time = np.zeros(C, dtype=int)
 for i in range(len(t)):
     time[k[i]:k[i+1]] = t[i]
 
-G = 4  # number of genes
 
-# ---------------------------------------------------------------------
-# Initialize network model
-# ---------------------------------------------------------------------
-model = NetworkModel(G)
+if outfile == 'Network4':
+    G = 4  # number of genes
+    # ---------------------------------------------------------------------
+    # Initialize network model
+    # ---------------------------------------------------------------------
+    model = NetworkModel(G)
+    # Gene degradation rates
+    model.d[0] = .2
+    model.d[1] = 0.04
+    # Basal expression levels
+    model.basal[1:] = -5
+    # Regulatory interactions
+    # Format: model.inter[regulator, target] = strength
+    model.inter[0,1] = 10   # Stimulus → gene1
+    model.inter[1,2] = 10   # gene1 → gene2
+    model.inter[1,3] = 10   # gene1 → gene3
+    model.inter[4,1] = -10  # gene4 → gene1 
+    model.inter[3,4] = 10  # gene3 → gene4 
+    model.inter[2,2] = 10   # gene2 self-activation
+    model.inter[3,3] = 10   # gene3 self-activation
 
-# Gene degradation rates
-model.d[0] = .2
-model.d[1] = 0.04
-
-# Basal expression levels
-model.basal[1:] = -5
-
-# Regulatory interactions
-# Format: model.inter[regulator, target] = strength
-model.inter[0,1] = 10   # Stimulus → gene1
-model.inter[1,2] = 10   # gene1 → gene2
-model.inter[1,3] = 10   # gene1 → gene3
-model.inter[4,1] = -10  # gene4 → gene1 
-model.inter[3,4] = 10  # gene3 → gene4 
-model.inter[2,2] = 10   # gene2 self-activation
-model.inter[3,3] = 10   # gene3 self-activation
+if outfile == 'Network8':
+    G = 8 # number of genes
+    # ---------------------------------------------------------------------
+    # Initialize network model
+    # ---------------------------------------------------------------------
+    model = NetworkModel(G)
+    # Gene degradation rates
+    model.d[0] = 0.4
+    model.d[1] = 0.08
+    # Basal expression levels
+    model.basal[1:] = -5
+    # Regulatory interactions
+    # Format: model.inter[regulator, target] = strength
+    model.inter[0, 1] = 10
+    model.inter[1, 2] = 10
+    model.inter[2, 3] = 10
+    model.inter[3, 4] = 10
+    model.inter[3, 5] = 10
+    model.inter[3, 6] = 10
+    model.inter[4, 1] = -10
+    model.inter[5, 1] = -10
+    model.inter[6, 1] = -10
+    model.inter[4, 4] = 10
+    model.inter[5, 5] = 10
+    model.inter[6, 6] = 10
+    model.inter[4, 8] = -10
+    model.inter[4, 7] = -10
+    model.inter[6, 7] = 10
+    model.inter[7, 6] = 10
+    model.inter[8, 8] = 10
 
 # Save true network topology as adjacency matrix
 inter = (abs(model.inter) > 0).astype(int)
-np.save(f"network/true/inter", inter)
-np.save(f"network/true/inter_signed", model.inter)
+np.save(f"{outfile}/true/inter", inter)
+np.save(f"{outfile}/true/inter_signed", model.inter)
 
 # ---------------------------------------------------------------------
 # Run multiple simulations
@@ -94,6 +126,6 @@ for r in range(N):
     adata_prot.var['d1'] = model.d[1]
 
     # Save dataset
-    adata_rna.write(f"network/data_rna/data_traj_{r+1}.h5ad")
-    adata_prot.write(f"network/data_prot/data_traj_{r+1}.h5ad")
+    adata_rna.write(f"{outfile}/data_rna/data_traj_{r+1}.h5ad")
+    adata_prot.write(f"{outfile}/data_prot/data_traj_{r+1}.h5ad")
 

@@ -1,5 +1,5 @@
 # =====================================================================
-# Benchmark undirected inference methods (AUPR curves)
+# outfile undirected inference methods (AUPR curves)
 #
 # Methods are discovered automatically from Python files in ./methods/
 # Only keep those with results in ./network/{method}/
@@ -18,14 +18,14 @@ from sklearn.metrics import precision_recall_curve, auc
 # ---------------------------------------------------------------------
 # Settings
 # ---------------------------------------------------------------------
-benchmark = "network"   # which dataset to evaluate
-N = 3                 # number of runs
-methods_path = "methods"
-results_path = benchmark
+# outfile = "Network8"   # which dataset to evaluate
+outfile = "Network4" # which dataset to evaluate
+methods_path = "methods"  # path to methods
+N = 5  # number of runs to take into account
 
 # ---------------------------------------------------------------------
 # Discover available methods = all .py files in methods/
-# Keep only those that have results in results_path/
+# Keep only those that have results in outfile/
 # ---------------------------------------------------------------------
 all_methods = [
     os.path.splitext(os.path.basename(f))[0]
@@ -33,13 +33,13 @@ all_methods = [
     if not f.endswith("__init__.py")
 ]
 
-methods = [m for m in all_methods if os.path.isdir(os.path.join(results_path, m))]
+methods = [m for m in all_methods if os.path.isdir(os.path.join(outfile, m))]
 print("Methods with results found:", methods)
 
 # ---------------------------------------------------------------------
 # Load true network and prepare edge list
 # ---------------------------------------------------------------------
-inter = abs(np.load(f"{results_path}/true/inter.npy"))
+inter = abs(np.load(f"{outfile}/true/inter.npy"))
 G = inter.shape[0]
 edges = [(i, j) for i in range(G) for j in range(i+1, G)]
 y_true = np.array([max(inter[i, j], inter[j, i]) for (i, j) in edges])
@@ -52,7 +52,7 @@ aupr = {m: [] for m in methods}
 for r in range(1, N+1):
     for m in methods:
         try:
-            score = abs(np.load(f"{results_path}/{m}/score_{r}.npy"))
+            score = abs(np.load(f"{outfile}/{m}/score_{r}.npy"))
         except FileNotFoundError:
             print(f"⚠️ Missing results for {m}, run {r}")
             continue
@@ -99,8 +99,8 @@ ax.set_xticks(positions)
 ax.set_xticklabels(methods, rotation=45, ha="right")
 ax.set_ylabel("AUPR")
 ax.set_ylim(0, 1)
-ax.set_title(f"AUPR Benchmark ({benchmark})")
+ax.set_title(f"AUPR outfile ({outfile})")
 
 plt.tight_layout()
-plt.savefig("benchmark_aupr.pdf", dpi=300)
+plt.savefig(f"{outfile}_aupr.pdf", dpi=300)
 plt.show()
