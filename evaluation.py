@@ -18,9 +18,10 @@ from sklearn.metrics import precision_recall_curve, auc
 # ---------------------------------------------------------------------
 # Settings
 # ---------------------------------------------------------------------
-# outfile = "Network8"   # which dataset to evaluate
-outfile = "Network4" # which dataset to evaluate
+outfile = "Network8"   # which dataset to evaluate
+# outfile = "Network4" # which dataset to evaluate
 methods_path = "methods"  # path to methods
+
 N = 5  # number of runs to take into account
 
 # ---------------------------------------------------------------------
