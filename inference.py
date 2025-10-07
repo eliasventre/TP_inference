@@ -3,6 +3,24 @@
 # with a chosen method (or all methods in ./methods/)
 # =====================================================================
 
+# outfile = 'Network8'
+outfile = 'Network4'
+
+type_data = 'traj'
+# type_data = 'distrib'
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import importlib
 import argparse
@@ -16,11 +34,6 @@ from binarize_data import binarize_mrnas
 import os
 import sys
 sys.path.append("methods")  # allow importing user-defined methods
-
-# outfile = 'Network8'
-outfile = 'Network4'
-type_data = 'traj'
-# type_data = 'distrib'
 
 # ---------------------------------------------------------------------
 # Command-line arguments
@@ -56,7 +69,7 @@ print("Selected methods:", selected_methods)
 # ---------------------------------------------------------------------
 # General settings
 # ---------------------------------------------------------------------
-N = 5     # number of simulation runs
+N = 3     # number of simulation runs
 verb = 1   # verbosity
 
 # ---------------------------------------------------------------------
@@ -104,27 +117,24 @@ for method in selected_methods:
         d0 = adata_rna.var['d0']
         d1 = adata_prot.var['d1']
 
+        ### THIS IS WHERE YOU ARE IMPLEMENTING
+
         # Initialize model
         model_inference = NetworkInference(G)
 
         # Fit the model on data : THIS IS THE CORE OF THIS TP
         model_inference.fit(X_rna, X_prot, d0, d1, time)
 
-        # if method == 'neuralODEs':
-        #     print(model_inference.inter, model_inference._bias)
-        #     # Visualisation UMAP
-        #     embedding, labels, time_labels = model_inference.compare_trajectories_umap(
-        #         X_prot, time, 
-        #         n_neighbors=15, 
-        #         min_dist=0.1
-        #     )
+         ### YOU PART ENDS UP HERE
 
-        #     # Trajectoires de gènes
-        #     model_inference.plot_gene_trajectories(
-        #         X_prot, time, 
-        #         gene_indices=np.arange(G), 
-        #         figsize=(15, 8)
-        #     )
+        if method == 'neuralODEs':
+            print(model_inference.inter, model_inference._bias)
+            # UMAP visualization
+            embedding, labels, time_labels = model_inference.compare_trajectories_umap(
+                X_prot, time, 
+                n_neighbors=15, 
+                min_dist=0.1
+            )
 
         # Get inferred network (adjacency / scores)
         score = model_inference.inter

@@ -7,8 +7,19 @@
 # AnnData objects, and the true network topology (adjacency matrix).
 # =====================================================================
 
-# outfile='Network8'
-outfile='Network4'
+# outfile='Network4'
+outfile='Network8'
+
+
+
+
+
+
+
+
+
+
+
 
 import sys
 sys.path += ['../']  # add Harissa to the Python path
@@ -19,15 +30,10 @@ import anndata as ad
 from harissa import NetworkModel
 
 # ---------------------------------------------------------------------
-# Reproducibility
-# ---------------------------------------------------------------------
-np.random.seed(0)
-
-# ---------------------------------------------------------------------
 # Simulation settings
 # ---------------------------------------------------------------------
 C = 1000   # number of cells
-N = 5     # number of independent simulation runs
+N = 3     # number of independent simulation runs
 
 # Time points (hours)
 t = np.linspace(0, 100, 10) 
@@ -100,12 +106,15 @@ np.save(f"{outfile}/true/inter_signed", model.inter)
 # ---------------------------------------------------------------------
 for r in range(N):
     print(f"Run {r+1}...")
+    
+    ### Simulate trajectories
 
-    # Simulated expression data
     data_rna = np.zeros((C, G+1), dtype=float)
     data_prot = np.zeros((C, G+1), dtype=float)
     data_rna[time > 0, 0] = 100 # Stimulus
     data_prot[time > 0, 0] = 1 # Stimulus
+    
+    # Simulated expression data
     n_cells_atorigin = np.sum(time==0)
     for c in range(C):
         if c < n_cells_atorigin:
@@ -128,4 +137,32 @@ for r in range(N):
     # Save dataset
     adata_rna.write(f"{outfile}/data_rna/data_traj_{r+1}.h5ad")
     adata_prot.write(f"{outfile}/data_prot/data_traj_{r+1}.h5ad")
+
+    ### Simulate distributions
+
+    data_rna = np.zeros((C, G+1), dtype=float)
+    data_prot = np.zeros((C, G+1), dtype=float)
+    data_rna[time > 0, 0] = 100 # Stimulus
+    data_prot[time > 0, 0] = 1 # Stimulus
+
+    # Simulated expression data
+    for c in range(C):
+        sim = model.simulate(time[c], burnin=5)
+        data_rna[c, 1:] = sim.m[-1]
+        data_prot[c, 1:] = sim.p[-1]
+
+
+    # Create AnnData object
+    adata_rna = ad.AnnData(X=np.random.poisson(data_rna))
+    adata_prot = ad.AnnData(X=data_prot)
+
+    # Add time information to observations
+    adata_rna.obs['time'] = time.astype(int)
+    adata_rna.var['d0'] = model.d[0]
+    adata_prot.obs['time'] = time.astype(int)
+    adata_prot.var['d1'] = model.d[1]
+
+    # Save dataset
+    adata_rna.write(f"{outfile}/data_rna/data_distrib_{r+1}.h5ad")
+    adata_prot.write(f"{outfile}/data_prot/data_distrib_{r+1}.h5ad")
 

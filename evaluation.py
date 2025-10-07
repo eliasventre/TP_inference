@@ -9,20 +9,29 @@
 # Output: AUPR boxplots per method
 # =====================================================================
 
+# ---------------------------------------------------------------------
+# Settings
+# ---------------------------------------------------------------------
+outfile = "Network4"   # which dataset to evaluate
+# outfile = "Network8" # which dataset to evaluate
+
+
+
+
+
+
+
+
+
 import os
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_recall_curve, auc
 
-# ---------------------------------------------------------------------
-# Settings
-# ---------------------------------------------------------------------
-outfile = "Network8"   # which dataset to evaluate
-# outfile = "Network4" # which dataset to evaluate
 methods_path = "methods"  # path to methods
 
-N = 5  # number of runs to take into account
+N = 3  # number of runs to take into account
 
 # ---------------------------------------------------------------------
 # Discover available methods = all .py files in methods/
