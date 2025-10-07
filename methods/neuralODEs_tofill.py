@@ -131,7 +131,7 @@ class NetworkInference:
         
         # --- Optimizer and loss ---
         optimizer = torch.optim.Adam(self.ode_func.parameters(), lr=lr, weight_decay=weight_decay)
-        mse = nn.MSELoss(reduction='mean')
+        loss_custom = ...
 
         # --- Training loop ---
         old_loss = 1e16
@@ -169,7 +169,7 @@ class NetworkInference:
                 X_pred[:, 0] = 1.0
                 
                 # Compute loss
-                loss_batch = mse(X_pred, X1_tensor)
+                loss_batch = ...
                 total_loss += loss_batch * X0_batch.shape[0]
                 total_count += X0_batch.shape[0]
             
@@ -301,7 +301,7 @@ class NetworkInference:
         time_combined = np.concatenate([time_np, time_pred_concat])
         
         # Fit UMAP
-        print("Fitting UMAP...")
+        print("Fitting UMAP")
         umap_model = umap.UMAP(
             n_neighbors=n_neighbors,
             min_dist=min_dist,
