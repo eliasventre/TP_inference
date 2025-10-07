@@ -30,7 +30,9 @@ class GRNInference(nn.Module):
         X_prot: (batch_size, G)
         Retourne: (batch_size, G)
         """
-        kon = ...
+        pre_activation = X_prot @ self.theta.T + self.bias
+        sigmoid_output = torch.sigmoid(pre_activation)
+        kon = self.k0 + (self.k1 - self.k0) * sigmoid_output
         return kon
 
 
