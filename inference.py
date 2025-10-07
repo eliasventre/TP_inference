@@ -3,8 +3,8 @@
 # with a chosen method (or all methods in ./methods/)
 # =====================================================================
 
-# outfile = 'Network8'
 outfile = 'Network4'
+# outfile = 'Network8'
 
 type_data = 'traj'
 # type_data = 'distrib'

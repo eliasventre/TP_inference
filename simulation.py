@@ -7,8 +7,8 @@
 # AnnData objects, and the true network topology (adjacency matrix).
 # =====================================================================
 
-# outfile='Network4'
-outfile='Network8'
+outfile='Network4'
+# outfile='Network8'
 
 
 
